@@ -24,10 +24,6 @@ VALID_TRANSITIONS = {
     'reviewed': ['approved', 'draft'],
     'approved': [],
 }
-
-
-# ── Auth ─────────────────────────────────────────────────────────────────────
-
 @api_view(['GET','POST'])
 @permission_classes([AllowAny])
 def ping(request):
@@ -79,9 +75,6 @@ def users_by_role(request):
         qs = qs.filter(role=role)
     return Response(UserSerializer(qs, many=True).data)
 
-
-# ── Placements ───────────────────────────────────────────────────────────────
-
 class PlacementListCreateView(generics.ListCreateAPIView):
     serializer_class = PlacementSerializer
 
@@ -116,9 +109,6 @@ class PlacementDetailView(generics.RetrieveUpdateDestroyAPIView):
         return InternshipPlacement.objects.filter(
             Q(workplace_supervisor=user) | Q(academic_supervisor=user)
         )
-
-
-# ── Weekly Logs ───────────────────────────────────────────────────────────────
 
 class WeeklyLogListCreateView(generics.ListCreateAPIView):
     serializer_class = WeeklyLogSerializer
@@ -244,8 +234,6 @@ def log_audit_trail(request, pk):
     return Response(LogStatusHistorySerializer(history, many=True).data)
 
 
-# ── Supervisor ────────────────────────────────────────────────────────────────
-
 @api_view(['GET'])
 def supervisor_queue(request):
     user = request.user
@@ -258,9 +246,6 @@ def supervisor_queue(request):
         'pending_review': WeeklyLogSerializer(pending, many=True).data,
         'pending_approval': WeeklyLogSerializer(for_approval, many=True).data,
     })
-
-
-# ── Evaluations ───────────────────────────────────────────────────────────────
 
 class EvaluationListCreateView(generics.ListCreateAPIView):
     serializer_class = EvaluationSerializer
@@ -314,10 +299,6 @@ def placement_score(request, pk):
             placement.evaluations.all(), many=True, context={'request': request}
         ).data,
     })
-
-
-# ── Dashboards ────────────────────────────────────────────────────────────────
-
 @api_view(['GET'])
 def student_dashboard(request):
     if request.user.role != 'student':

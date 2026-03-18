@@ -6,9 +6,6 @@ from .models import (
     LogStatusHistory, EvaluationCriteria, Evaluation
 )
 
-
-# ── User ──────────────────────────────────────────────────────────────────────
-
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
@@ -80,15 +77,12 @@ class RegisterSerializer(serializers.ModelSerializer):
         return value
 
     def validate(self, data):
-        # Passwords must match
         password = data.get('password')
         confirm_password = data.pop('confirm_password', None)
         if password != confirm_password:
             raise serializers.ValidationError({
                 'confirm_password': 'Passwords do not match.'
             })
-
-        # Run Django built-in password validators
         try:
             validate_password(password)
         except DjangoValidationError as e:
@@ -105,9 +99,6 @@ class RegisterSerializer(serializers.ModelSerializer):
             role=validated_data.get('role', 'student'),
             phone=validated_data.get('phone', ''),
         )
-
-
-# ── Placement ─────────────────────────────────────────────────────────────────
 
 class PlacementSerializer(serializers.ModelSerializer):
     student_username = serializers.CharField(
@@ -151,7 +142,6 @@ class PlacementSerializer(serializers.ModelSerializer):
                 'end_date': 'End date must be after start date.'
             })
 
-        # Overlap check — a student cannot have two active placements at the same time
         qs = InternshipPlacement.objects.filter(
             student=student,
             is_active=True,
@@ -167,9 +157,6 @@ class PlacementSerializer(serializers.ModelSerializer):
 
         return data
 
-
-# ── Log status history ────────────────────────────────────────────────────────
-
 class LogStatusHistorySerializer(serializers.ModelSerializer):
     changed_by_username = serializers.CharField(
         source='changed_by.username', read_only=True
@@ -184,9 +171,6 @@ class LogStatusHistorySerializer(serializers.ModelSerializer):
             'comment', 'changed_at',
         ]
         read_only_fields = fields
-
-
-# ── Weekly log ────────────────────────────────────────────────────────────────
 
 class WeeklyLogSerializer(serializers.ModelSerializer):
     student_username = serializers.CharField(
@@ -241,8 +225,7 @@ class WeeklyLogSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError(
                     'You can only create logs for your own placement.'
                 )
-
-        # One log per week per placement
+            
         week_number = data.get('week_number')
         if week_number and placement:
             qs = WeeklyLog.objects.filter(
@@ -258,9 +241,6 @@ class WeeklyLogSerializer(serializers.ModelSerializer):
 
         return data
 
-
-# ── Evaluation criteria ───────────────────────────────────────────────────────
-
 class EvaluationCriteriaSerializer(serializers.ModelSerializer):
     class Meta:
         model = EvaluationCriteria
@@ -272,9 +252,6 @@ class EvaluationCriteriaSerializer(serializers.ModelSerializer):
         if value > 100:
             raise serializers.ValidationError('Weight cannot exceed 100.')
         return value
-
-
-# ── Evaluation ────────────────────────────────────────────────────────────────
 
 class EvaluationSerializer(serializers.ModelSerializer):
     criteria_name = serializers.CharField(

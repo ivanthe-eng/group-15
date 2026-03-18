@@ -1,0 +1,21 @@
+# Core Django
+django>=4.2,<5.0
+djangorestframework>=3.14
+
+# JWT authentication
+djangorestframework-simplejwt>=5.3
+
+# CORS — allows React to talk to Django
+django-cors-headers>=4.3
+
+# PostgreSQL database driver
+psycopg2-binary>=2.9
+
+# Reads your .env file into settings
+python-dotenv>=1.0
+
+# Testing
+pytest>=7.4
+pytest-django>=4.7
+pytest-cov>=4.1
+factory-boy>=3.3
